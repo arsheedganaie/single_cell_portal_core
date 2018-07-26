@@ -113,6 +113,7 @@
     // when changing cluster, re-render annotation options and call render function
     $("#cluster").change(function(){
         $('#heatmap-plot').data('rendered', false);
+
         var newCluster = $(this).val();
         // keep track for search purposes
         $('#search_cluster').val(newCluster);
@@ -141,45 +142,25 @@
 
     $('#resize-heatmap').click(function() {
         $('#heatmap-plot').data('rendered', false);
+
+
         var newHeight = parseInt($('#heatmap_size').val());
         $("#heatmap-plot").data('height', newHeight);
         console.log('resizing heatmap to ' + newHeight);
         drawHeatmap(newHeight);
     });
 
-    // eweitz 2018-02-07: We removed the view-fullscreen button last month.  Is this needed?
-    $('#view-fullscreen').click(function() {
-        $('#heatmap-plot').data('rendered', false);
-        var btn = $(this);
-        var btnState = btn.data('active');
-        var newState = btnState === 'on' ? 'off' : 'on';
-        btn.data('active', newState);
-        btn.toggleClass('active');
-        toggleSearch();
-        var searchDisplay = $('#search-options-panel').css('display');
-        var currHeight = $('#heatmap_size').val();
-        var redraw = searchDisplay === 'none' || currHeight !== '';
-        // toggle view options if search options has been hidden
-        if (searchDisplay === 'none') {
-            $('#view-options').collapse('hide');
-        }
-        if (redraw) {
-            // if currHeight is blank, calling drawHeatmap with NaN for height will render all rows visible
-            drawHeatmap(parseInt(currHeight));
-        } else {
-            drawHeatmap();
-        }
-    });
-
     $('.fit-btn').click(function() {
         $('#heatmap-plot').data('rendered', false);
+
+
         var btn = $(this);
         var btnState = btn.data('active');
         var newState = btnState === 'on' ? 'off' : 'on';
         btn.data('active', newState);
         var fitType = btn.data('fit');
         console.log('setting fit type: ' + fitType + 'to ' + newState);
-        var plot = $('#heatmap-plot');
+
         btn.toggleClass('active');
         currFit = plot.data('fit');
         // determine state and set appropriately
@@ -195,8 +176,7 @@
             }
         }
 
-        plot.data('fit', fitType);
+        $('#heatmap-plot').data('fit', fitType);
         drawHeatmap();
     });
-
 </script>

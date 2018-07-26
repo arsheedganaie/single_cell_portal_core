@@ -613,7 +613,8 @@ function renderMorpheus(dataPath, annotPath, selectedAnnot, selectedAnnotType, t
     console.log('render status of ' + target + ' at start: ' + $(target).data('rendered'));
     $(target).empty();
     console.log("scaling mode: " + colorScaleMode);
-    var config = {dataset: dataPath, el: $(target), menu: null, colorScheme: {scalingMode: colorScaleMode}};
+    // collapse by median
+    var config = {name: 'Heatmap', dataset: dataPath, el: $(target), menu: null, colorScheme: {scalingMode: colorScaleMode}};
 
     // set height if specified, otherwise use default setting of 500 px
     if (heatmapHeight !== undefined) {
@@ -665,10 +666,86 @@ function renderMorpheus(dataPath, annotPath, selectedAnnot, selectedAnnotType, t
     // instantiate heatmap and embed in DOM element
     var heatmap = new morpheus.HeatMap(config);
 
+    console.log(heatmap);
+    //var dotPlot = new morpheus.HeatMap()
+    //var tabM = heatmap.tabManager;
+    //var tabNames = [];
+    //$('.morpheus-sortable').children().each(function(y,x){tabNames.push(x.getAttribute("data-link"))});
+    //console.log(tabNames);
+    //console.log(tabM.getActiveTabId());
+
     // set render variable to true for tests
     $(target).data('morpheus', heatmap);
     $(target).data('rendered', true);
     console.log('render status of ' + target + ' at end: ' + $(target).data('rendered'));
+
+}
+
+function renderMorpheusDotPlot(dataPath, annotPath, selectedAnnot, selectedAnnotType, target, annotations, fitType, dotHeight, colorScaleMode, consesus) {
+    console.log('render status of ' + target + ' at start: ' + $(target).data('rendered'));
+    $(target).empty();
+    console.log("scaling mode: " + colorScaleMode);
+    // collapse by median
+    var tools = [{ name: "Collapse", params: {shape: 'circle', collapse: ["Columns"], collapse_to_fields: [selectedAnnot], compute_percent: true, pass_expression: ">", pass_value:"0", percentile:"100"}}];
+
+    var config = {shape: 'circle', name: 'Dot Plot', dataset: dataPath, el: $(target), menu: null, colorScheme: {scalingMode: colorScaleMode}, tools: tools};
+
+
+    // set height if specified, otherwise use default setting of 500 px
+    if (dotHeight !== undefined) {
+        config.height = dotHeight;
+    } else {
+        config.height = 500;
+    }
+
+    // fit rows, columns, or both to screen
+    if (fitType === 'cols') {
+        config.columnSize = 'fit';
+    } else if (fitType === 'rows') {
+        config.rowSize = 'fit';
+    } else if (fitType === 'both') {
+        config.columnSize = 'fit';
+        config.rowSize = 'fit';
+    } else {
+        config.columnSize = null;
+        config.rowSize = null;
+    }
+
+    // load annotations if specified
+    if (annotPath !== '') {
+        config.columnAnnotations = [{
+            file : annotPath,
+            datasetField : 'id',
+            fileField : 'NAME',
+            include: [selectedAnnot]}
+        ];
+        config.columnSortBy = [
+            {field: selectedAnnot, order:0}
+        ];
+        config.columns = [
+            {field: selectedAnnot, display: 'text'}
+        ];
+        // create mapping of selected annotations to colorBrewer colors
+        var annotColorModel = {};
+        annotColorModel[selectedAnnot] = {};
+        var sortedAnnots = annotations['values'].sort();
+
+        // calling % 27 will always return to the beginning of colorBrewerSet once we use all 27 values
+        $(sortedAnnots).each(function(index, annot) {
+            annotColorModel[selectedAnnot][annot] = colorBrewerSet[index % 27];
+        });
+        config.columnColorModel = annotColorModel;
+    }
+
+    // instantiate heatmap and embed in DOM element
+    var dotPlot = new morpheus.HeatMap(config);
+    console.log(dotPlot);
+
+    // set render variable to true for tests
+    $(target).data('morpheus', dotPlot);
+    $(target).data('rendered', true);
+    console.log('render status of ' + target + ' at end: ' + $(target).data('rendered'));
+
 
 }
 

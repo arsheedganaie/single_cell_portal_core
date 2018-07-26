@@ -28,6 +28,160 @@
     </div>
   </div>
 </div>
+<% if true %>
+  <div class="tab-pane expression-plot" id="dot-plots-tab" role="tabpanel">
+    <div class="panel panel-default no-top-border">
+      <div id="dot-controls" class="panel-collapse collapse in">
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-12">
+              <%= render partial: 'morpheus_help' %>
+              <div id="dot-plot"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript" nonce="<%= content_security_policy_script_nonce %>">
+      // monitor status of rendering plots for tests
+      $('#dot-plot').data('rendered', false);
+
+      function drawDotplot(height) {
+          $(window).off('resizeEnd');
+          // clear out previous stored dotplot object
+          $('#dot-plot').data('dotplot', null);
+          // if height isn't specified, pull from stored value, defaults to 500
+          if (height === undefined) {
+              height = $('#dot-plot').data('height');
+          }
+          // pull fit type as well, defaults to ''
+          var fit = $('#dot-plot').data('fit');
+
+          var dataPath = '<%= javascript_safe_url(expression_query_path(study_name: params[:study_name], search: {genes: @genes })) %>';
+          var dotplot_row_centering = $('#dotplot_row_centering').val();
+          var selectedAnnot = $('#annotation').val();
+          var annotName = selectedAnnot.split('--')[0];
+          var annotType = selectedAnnot.split('--')[1];
+          dataPath += '&row_centered=' + dotplot_row_centering;
+          var cluster = $('#cluster').val();
+          $("#search_cluster").val(cluster);
+          $('#search_annotation').val(''); // clear value first
+          $("#search_annotation").val(selectedAnnot);
+          var requestToken = '<%= user_signed_in? ? current_user.id.to_s + ':' + current_user.authentication_token : nil %>';
+          dataPath += '&cluster=' + cluster + '&request_user_token=' + requestToken;
+          var newAnnotPath = '<%= annotation_query_path(study_name: params[:study_name]) %>?cluster=' + cluster + '&annotation=' + selectedAnnot + '&request_user_token=' + requestToken;
+          var colorScalingMode = 'relative';
+          // determine whether to scale row colors globally or by row
+          if (dotplot_row_centering !== '') {
+              colorScalingMode = 'fixed';
+          }
+          var consensus = "<%= params[:consensus] %>";
+          console.log(consensus);
+          // log action of rendering Morpheus
+          var logUrl = '<%= javascript_safe_url(expression_query_path(study_name: params[:study_name], search: {genes: @gene_list })) %>';
+          logUrl += '--cluster=' + cluster + '--annotation=' + annotName;
+          $.ajax({
+              url: '<%= log_action_path %>?url_string=' + logUrl,
+              dataType: 'script'
+          });
+
+          var renderUrlParams = getRenderUrlParams();
+          // get annotation values to set color values in Morpheus and draw dotplot in callback
+          $.ajax({
+              url: '<%= annotation_values_path(study_name: @study.url_safe_name) %>?' + renderUrlParams,
+              dataType: 'JSON',
+              success: function(annotations) {
+                  renderMorpheusDotPlot(dataPath, newAnnotPath, annotName, annotType, '#dot-plot', annotations, fit, height, colorScalingMode);
+              }
+          });
+      }
+
+      $(document).ready(function() {
+          $('#dot-plot').data('fit', '');
+          $('#dot-plot').data('height', 500);
+          drawDotplot();
+      });
+
+      $("#dotplot_row_centering, #annotation").change(function() {
+          $('#dot-plot').data('rendered', false);
+          if ($(this).attr('id') == 'annotation') {
+              var an = $(this).val();
+              // keep track for search purposes
+              $('#search_annotation').val(an);
+              $('#gene_set_annotation').val(an);
+          }
+          drawDotplot();
+      });
+      // when changing cluster, re-render annotation options and call render function
+      $("#cluster").change(function(){
+          $('#dot-plot').data('rendered', false);
+
+          var newCluster = $(this).val();
+          // keep track for search purposes
+          $('#search_cluster').val(newCluster);
+          $('#gene_set_cluster').val(newCluster);
+          var currAnnot = $('#annotation').val();
+          // get new annotation options and re-render
+          $.ajax({
+              url: "<%= get_new_annotations_path(study: params[:study])%>?cluster=" + newCluster,
+              method: 'GET',
+              dataType: 'script',
+              success: function (data) {
+                  // parse response as a string and see if currently selected annotation exists in new annotations
+                  if (data.indexOf(currAnnot) >= 0) {
+                      $('#annotation').val(currAnnot);
+                  }
+                  $(document).ready(function () {
+                      // since we now have new annotations, we need to set them in the search form for persistence
+                      var an = $('#annotation').val();
+                      $('#search_annotation').val(an);
+                      $('#gene_set_annotation').val(an);
+                      drawDotplot();
+                  });
+              }
+          });
+      });
+
+      $('#resize-dotplot').click(function() {
+          $('#dot-plot').data('rendered', false);
+
+          var newHeight = parseInt($('#dotplot_size').val());
+          $("#dot-plot").data('height', newHeight);
+          console.log('resizing dotplot to ' + newHeight);
+          drawDotplot(newHeight);
+      });
+
+      $('.fit-btn').click(function() {
+          $('#dot-plot').data('rendered', false);
+
+          var btn = $(this);
+          var btnState = btn.data('active');
+          var newState = btnState === 'on' ? 'off' : 'on';
+          btn.data('active', newState);
+          var fitType = btn.data('fit');
+          console.log('setting fit type: ' + fitType + 'to ' + newState);
+
+          btn.toggleClass('active');
+          currFit = plot.data('fit');
+          // determine state and set appropriately
+          if (newState == 'on') {
+              if (currFit !== '' && fitType !== currFit) {
+                  fitType = 'both'
+              }
+          } else {
+              if (currFit === 'both') {
+                  fitType = fitType === 'rows' ? 'cols' : 'rows';
+              } else {
+                  fitType = '';
+              }
+          }
+
+          $('#dot-plot').data('fit', fitType);
+          drawDotplot();
+      });
+  </script>
+<% end %>
 <% if @study.has_analysis_outputs?('infercnv', 'ideogram.js') or @study.has_bam_files? %>
   <div class="tab-pane" id="genome-tab" role="tabpanel" >
     <div class="panel panel-default no-top-border">
