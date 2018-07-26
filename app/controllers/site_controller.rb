@@ -402,6 +402,8 @@ class SiteController < ApplicationController
     subsample = params[:subsample].blank? ? nil : params[:subsample].to_i
     consensus = params[:consensus].nil? ? 'Mean ' : params[:consensus].capitalize + ' '
     @gene_list = @genes.map{|gene| gene['gene']}.join(',')
+    dotplot_genes, dotplot_not_found = search_expression_scores(terms)
+    @dotplot_gene_list = dotplot_genes.map{|gene| gene['name']}.join(',')
     @y_axis_title = consensus + ' ' + load_expression_axis_title
     # depending on annotation type selection, set up necessary partial names to use in rendering
     if @selected_annotation[:type] == 'group'

@@ -58,7 +58,7 @@
           // pull fit type as well, defaults to ''
           var fit = $('#dot-plot').data('fit');
 
-          var dataPath = '<%= javascript_safe_url(expression_query_path(study_name: params[:study_name], search: {genes: @genes })) %>';
+          var dataPath = '<%= javascript_safe_url(expression_query_path(study_name: params[:study_name], search: {genes: @dotplot_gene_list })) %>';
           var dotplot_row_centering = $('#dotplot_row_centering').val();
           var selectedAnnot = $('#annotation').val();
           var annotName = selectedAnnot.split('--')[0];
@@ -79,7 +79,7 @@
           var consensus = "<%= params[:consensus] %>";
           console.log(consensus);
           // log action of rendering Morpheus
-          var logUrl = '<%= javascript_safe_url(expression_query_path(study_name: params[:study_name], search: {genes: @gene_list })) %>';
+          var logUrl = '<%= javascript_safe_url(expression_query_path(study_name: params[:study_name], search: {genes: @dotplot_gene_list })) %>';
           logUrl += '--cluster=' + cluster + '--annotation=' + annotName;
           $.ajax({
               url: '<%= log_action_path %>?url_string=' + logUrl,
