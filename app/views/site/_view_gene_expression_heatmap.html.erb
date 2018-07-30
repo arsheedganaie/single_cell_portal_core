@@ -104,7 +104,7 @@
             dataType: 'JSON',
             success: function(annotations) {
                 renderMorpheus(dataPath, newAnnotPath, annotName, annotType, '#heatmap-plot', annotations, fit, height, colorScalingMode);
-                renderMorpheusDotPlot(dataPath, newAnnotPath, annotName, annotType, '#dot-plot', annotations, fit, height, colorScalingMode);
+                renderMorpheusDotPlot(dataPath, newAnnotPath, annotName, annotType, '#dot-plot', annotations, fit, height);
             }
         });
     }

@@ -6,11 +6,24 @@
     <div class="row-offcanvas row-offcanvas-right">
       <div id="view-options-nav"><a href="#view-options" id="view-option-link" data-toggle="offcanvas"><i class="fas fa-cog" aria-hidden="true"></i> View Options </a></div>
       <ul class="nav nav-tabs" role="tablist" id="view-tabs">
-        <li role="presentation" class="study-nav active" id="plots-tab-nav"><a href="#plots-tab" data-toggle="tab">Heatmap </a></li>
+        <li role="presentation" class="study-nav active" id="dot=plots-tab-nav"><a href="#dot-plots-tab" data-toggle="tab">Dot Plot </a></li>
+        <li role="presentation" class="study-nav" id="plots-tab-nav"><a href="#plots-tab" data-toggle="tab">Heatmap </a></li>
       </ul>
       <%= render partial: 'view_options' %>
       <div class="tab-content">
-        <div class="tab-pane active" id="plots-tab" role="tabpanel">
+        <div class="tab-pane active" id="dot-plots-tab" role="tabpanel">
+          <div class="panel panel-default no-top-border">
+            <div id="plots" class="panel-collapse collapse in">
+              <div class="panel-body">
+                <div class="col-md-12">
+                  <%= render partial: 'morpheus_help' %>
+                  <div id="dot-plot"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane" id="plots-tab" role="tabpanel">
           <div class="panel panel-default no-top-border">
             <div id="plots" class="panel-collapse collapse in">
               <div class="panel-body">
@@ -33,10 +46,12 @@
 
     // monitor status of rendering plots for tests
     $('#heatmap-plot').data('rendered', false);
+    $('#dot-plot').data('rendered', false);
 
     $('#heatmap_row_centering, #expression').change(function() {
         // clear out previous stored heatmap object
         $('#heatmap-plot').data('heatmap', null);
+        $('#dot-plot').data('heatmap', null);
         if ($('#expression').val() != '') {
             var newDataPath = '<%= precomputed_results_path(study_name: params[:study_name]) %>';
             var precomputed = $('#expression').val();
@@ -52,7 +67,9 @@
 
             // reset status on render call
             $('#heatmap-plot').data('rendered', false);
+            $('#dot-plot').data('rendered', false);
             renderMorpheus(newDataPath, '', '', '', '#heatmap-plot', {}, 'both', null, colorScalingMode);
+            renderMorpheusDotPlot(newDataPath, '', '', '', '#dot-plot', {}, 'both', null);
         }
     });
 
@@ -69,6 +86,7 @@
         }
 
         renderMorpheus(dataPath, '', '', '', '#heatmap-plot', {}, 'both', null, colorScalingMode);
+        renderMorpheusDotPlot(dataPath, '', '', '', '#dot-plot', {}, 'both', null);
     });
 
 </script>

@@ -28,7 +28,7 @@
     </div>
   </div>
 </div>
-<% if !@dotplot_gene_list.nil? %>
+<% if !@genes.nil? %>
   <div class="tab-pane expression-plot" id="dot-plots-tab" role="tabpanel">
     <div class="panel panel-default no-top-border">
       <div id="dot-controls" class="panel-collapse collapse in">
@@ -92,7 +92,7 @@
               url: '<%= annotation_values_path(study_name: @study.url_safe_name) %>?' + renderUrlParams,
               dataType: 'JSON',
               success: function(annotations) {
-                  renderMorpheusDotPlot(dataPath, newAnnotPath, annotName, annotType, '#dot-plot', annotations, fit, height, colorScalingMode);
+                  renderMorpheusDotPlot(dataPath, newAnnotPath, annotName, annotType, '#dot-plot', annotations, fit, height);
               }
           });
       }

@@ -681,15 +681,14 @@ function renderMorpheus(dataPath, annotPath, selectedAnnot, selectedAnnotType, t
 
 }
 
-function renderMorpheusDotPlot(dataPath, annotPath, selectedAnnot, selectedAnnotType, target, annotations, fitType, dotHeight, colorScaleMode, consesus) {
+function renderMorpheusDotPlot(dataPath, annotPath, selectedAnnot, selectedAnnotType, target, annotations, fitType, dotHeight) {
     console.log('render status of ' + target + ' at start: ' + $(target).data('rendered'));
     $(target).empty();
-    console.log("scaling mode: " + colorScaleMode);
+
     // collapse by median
     var tools = [{ name: "Collapse", params: {shape: 'circle', collapse: ["Columns"], collapse_to_fields: [selectedAnnot], compute_percent: true, pass_expression: ">", pass_value:"0", percentile:"100"}}];
 
-    var config = {shape: 'circle', name: 'Dot Plot', dataset: dataPath, el: $(target), menu: null, colorScheme: {scalingMode: colorScaleMode}, tools: tools};
-
+    var config = {shape: 'circle', dataset: dataPath, el: $(target), menu: null, colorScheme: {scalingMode: 'relative'}, tools: tools};
 
     // set height if specified, otherwise use default setting of 500 px
     if (dotHeight !== undefined) {
@@ -725,6 +724,9 @@ function renderMorpheusDotPlot(dataPath, annotPath, selectedAnnot, selectedAnnot
         config.columns = [
             {field: selectedAnnot, display: 'text'}
         ];
+        config.rows = [
+            {field: 'id', display: 'text'}
+        ];
         // create mapping of selected annotations to colorBrewer colors
         var annotColorModel = {};
         annotColorModel[selectedAnnot] = {};
@@ -737,9 +739,15 @@ function renderMorpheusDotPlot(dataPath, annotPath, selectedAnnot, selectedAnnot
         config.columnColorModel = annotColorModel;
     }
 
+
     // instantiate heatmap and embed in DOM element
     var dotPlot = new morpheus.HeatMap(config);
-    console.log(dotPlot);
+    dotPlot.tabManager.setOptions({autohideTabBar:true});
+    $(target).on('heatMapLoaded', function (e, heatMap) {
+        var tabItems = dotPlot.getTabManager().getTabItems();
+        dotPlot.getTabManager().setActiveTab(tabItems[1].id);
+        dotPlot.getTabManager().remove(tabItems[0].id);
+    });
 
     // set render variable to true for tests
     $(target).data('morpheus', dotPlot);
