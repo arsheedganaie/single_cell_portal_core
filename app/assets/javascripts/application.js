@@ -740,6 +740,13 @@ function renderMorpheusDotPlot(dataPath, annotPath, selectedAnnot, selectedAnnot
     }
 
 
+
+    config.colorScheme = {
+        values : [0, 0.5,1],
+        colors : ["blue", "purple", "red"]
+    };
+
+
     // instantiate heatmap and embed in DOM element
     var dotPlot = new morpheus.HeatMap(config);
     dotPlot.tabManager.setOptions({autohideTabBar:true});
