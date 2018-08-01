@@ -15,10 +15,10 @@
       <div id="view-options-nav"><a href="#view-options" id="view-option-link" data-toggle="offcanvas"><i class="fas fa-cog" aria-hidden="true"></i> View Options </a></div>
       <ul class="nav nav-tabs" role="tablist" id="view-tabs">
         <li role="presentation" class="study-nav active" id="box-or-violin-tab-nav"><a href="#box-or-violin-tab" id="distribution-link" data-toggle="tab">Distribution</a></li>
+        <li role="presentation" class="study-nav" id="scatter-tab-nav"><a href="#scatter-tab" id="scatter-link" data-toggle="tab">Scatter</a></li>
         <% if !@genes.nil? or @precomputed_heatmap %>
           <li role="presentation" class="study-nav" id="dot-plots-tab-nav"><a href="#dot-plots-tab" id="dot-plots-link" data-toggle="tab">Dot Plot</a></li>
         <% end %>
-        <li role="presentation" class="study-nav" id="scatter-tab-nav"><a href="#scatter-tab" id="scatter-link" data-toggle="tab">Scatter</a></li>
         <% if @study.has_bam_files? %>
             <li role="presentation" class="study-nav" id="genome-tab-nav" style="display: none">
             <a href="#genome-tab" data-toggle="tab">Genome </a>

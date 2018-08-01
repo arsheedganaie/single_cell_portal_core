@@ -750,10 +750,11 @@ function renderMorpheusDotPlot(dataPath, annotPath, selectedAnnot, selectedAnnot
     // instantiate heatmap and embed in DOM element
     var dotPlot = new morpheus.HeatMap(config);
     dotPlot.tabManager.setOptions({autohideTabBar:true});
+    $(target).off();
     $(target).on('heatMapLoaded', function (e, heatMap) {
-        var tabItems = dotPlot.getTabManager().getTabItems();
-        dotPlot.getTabManager().setActiveTab(tabItems[1].id);
-        dotPlot.getTabManager().remove(tabItems[0].id);
+        var tabItems = dotPlot.tabManager.getTabItems();
+        dotPlot.tabManager.setActiveTab(tabItems[1].id);
+        dotPlot.tabManager.remove(tabItems[0].id);
     });
 
     // set render variable to true for tests
