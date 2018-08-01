@@ -667,12 +667,6 @@ function renderMorpheus(dataPath, annotPath, selectedAnnot, selectedAnnotType, t
     var heatmap = new morpheus.HeatMap(config);
 
     console.log(heatmap);
-    //var dotPlot = new morpheus.HeatMap()
-    //var tabM = heatmap.tabManager;
-    //var tabNames = [];
-    //$('.morpheus-sortable').children().each(function(y,x){tabNames.push(x.getAttribute("data-link"))});
-    //console.log(tabNames);
-    //console.log(tabM.getActiveTabId());
 
     // set render variable to true for tests
     $(target).data('morpheus', heatmap);
