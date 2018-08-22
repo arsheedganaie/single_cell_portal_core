@@ -982,7 +982,7 @@ class Study
 
       # next, check if this is a re-parse job, in which case we need to remove all existing entries first
       if opts[:reparse]
-        self.genes.where(study_file_id: expression_file.id).delete_all
+        Gene.where(study_id: self.id, study_file_id: expression_file.id).delete_all
         DataArray.where(study_id: self.id, study_file_id: expression_file.id).delete_all
         expression_file.invalidate_cache_by_file_type
       end
@@ -1245,8 +1245,8 @@ class Study
 
       # next, check if this is a re-parse job, in which case we need to remove all existing entries first
       if opts[:reparse]
-        self.cluster_groups.where(study_file_id: ordinations_file.id).delete_all
-        self.data_arrays.where(study_file_id: ordinations_file.id).delete_all
+        ClusterGroup.where(study_id: self.id, study_file_id: ordinations_file.id).delete_all
+        DataArray.where(study_id: self.id, study_file_id: ordinations_file.id).delete_all
         ordinations_file.invalidate_cache_by_file_type
       end
 
@@ -1587,7 +1587,7 @@ class Study
 
       # next, check if this is a re-parse job, in which case we need to remove all existing entries first
       if opts[:reparse]
-        self.data_arrays.where(study_file_id: coordinate_file.id).delete_all
+        DataArray.where(study_id: self.id, study_file_id: coordinate_file.id).delete_all
         coordinate_file.invalidate_cache_by_file_type
       end
 
@@ -1801,7 +1801,8 @@ class Study
 
       # next, check if this is a re-parse job, in which case we need to remove all existing entries first
       if opts[:reparse]
-        self.cell_metadata.delete_all
+        CellMetadatum.where(study_id: self.id).delete_all
+        DataArray.where(study_file_id: metadata_file.id).delete_all
         metadata_file.invalidate_cache_by_file_type
       end
 

@@ -317,7 +317,7 @@ class StudyFile
     study_name = self.study.url_safe_name
     case self.file_type
       when 'Cluster'
-        name_key = self.cluster_groups.first.name.split.join('-')
+        name_key = self.name.split.join('-')
         @cache_key = "#{study_name}.*render_cluster.*#{name_key}"
       when 'Coordinate Labels'
         name_key = self.bundle_parent.name.split.join('-')
